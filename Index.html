@@ -489,17 +489,21 @@ footer {
   <h2 class="email-headline">Be first to get your hands on bloomy.</h2>
   <p class="email-sub">We're launching soon. Drop your email and we'll let you know the moment bloomy lands, plus an exclusive early-bird offer.</p>
 
-  <div class="email-form" role="form" aria-label="Email signup">
+  <form class="email-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleSubmit(event)">
+    <input type="hidden" name="form-name" value="waitlist"/>
+    <input type="hidden" name="bot-field"/>
     <input
       class="email-input"
       type="email"
+      name="email"
       id="email"
       placeholder="your@email.com"
       aria-label="Email address"
       autocomplete="email"
+      required
     />
-    <button class="email-btn" onclick="handleSubmit()">Notify Me</button>
-  </div>
+    <button class="email-btn" type="submit">Notify Me</button>
+  </form>
 
   <div class="email-success" id="successMsg" aria-live="polite">
     <span>&#x1F389;</span> You're on the list. See you soon!
@@ -526,24 +530,25 @@ footer {
 </footer>
 
 <script>
-  function handleSubmit() {
+  function handleSubmit(e) {
+    e.preventDefault();
+    const form = e.target;
     const input = document.getElementById('email');
-    const form  = document.querySelector('.email-form');
     const msg   = document.getElementById('successMsg');
 
-    if (!input.value || !input.value.includes('@')) {
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(new FormData(form)).toString()
+    })
+    .then(() => {
+      form.style.display = 'none';
+      msg.style.display  = 'flex';
+    })
+    .catch(() => {
       input.style.outline = '2px solid #f4911f';
-      input.focus();
-      return;
-    }
-
-    form.style.display = 'none';
-    msg.style.display  = 'flex';
+    });
   }
-
-  document.getElementById('email').addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleSubmit();
-  });
 
 
 </script>
